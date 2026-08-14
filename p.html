@@ -17,50 +17,51 @@
     }
 
     body {
-      display: grid;
-      place-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5vh 5vw;
+      box-sizing: border-box;
       background: Canvas;
       color: CanvasText;
       font-family: sans-serif;
       user-select: none;
     }
 
-    #container {
-      text-align: center;
-      line-height: 1.1;
-      white-space: nowrap;
-    }
-
     #weekday {
-      font-size: 0.5em;
+      font-size: min(5vw, 8vh);
       font-weight: 400;
+      text-align: center;
     }
 
     #date {
-      font-size: 1em;
+      font-size: min(12vw, 20vh);
       font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
     }
 
     #difference {
-      font-size: 0.35em;
+      font-size: min(4vw, 6vh);
       font-weight: 400;
+      text-align: center;
     }
 
-    #container.changed {
+    #date.changed,
+    #weekday.changed,
+    #difference.changed {
       color: red;
     }
   </style>
 </head>
 
 <body>
-  <div id="container">
-    <div id="weekday"></div>
-    <div id="date"></div>
-    <div id="difference"></div>
-  </div>
+  <div id="weekday"></div>
+  <div id="date"></div>
+  <div id="difference"></div>
 
   <script>
-    const container = document.getElementById("container");
     const weekday = document.getElementById("weekday");
     const date = document.getElementById("date");
     const difference = document.getElementById("difference");
@@ -71,32 +72,12 @@
     let selectedDate = new Date(today);
     let resetTimer;
 
-    function updateFontSize() {
-      let size = Math.min(window.innerWidth, window.innerHeight);
-
-      container.style.fontSize = `${size}px`;
-
-      while (
-        (container.scrollWidth > window.innerWidth ||
-         container.scrollHeight > window.innerHeight) &&
-        size > 1
-      ) {
-        size -= 1;
-        container.style.fontSize = `${size}px`;
-      }
-    }
-
     function updateDate() {
-      const formatter = new Intl.DateTimeFormat(
-        "en-US-u-ca-persian",
-        {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        }
-      );
-
-      const parts = formatter.formatToParts(selectedDate);
+      const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).formatToParts(selectedDate);
 
       const day = parts.find(p => p.type === "day").value;
       const month = parts.find(p => p.type === "month").value;
@@ -108,10 +89,9 @@
         weekday: "long"
       }).format(selectedDate);
 
-      const days =
-        Math.round(
-          (selectedDate - today) / (1000 * 60 * 60 * 24)
-        );
+      const days = Math.round(
+        (selectedDate - today) / (1000 * 60 * 60 * 24)
+      );
 
       if (days === 0) {
         difference.textContent = "Today";
@@ -125,9 +105,9 @@
         difference.textContent = `${Math.abs(days)} days ago`;
       }
 
-      container.classList.toggle("changed", days !== 0);
-
-      updateFontSize();
+      weekday.classList.toggle("changed", days !== 0);
+      date.classList.toggle("changed", days !== 0);
+      difference.classList.toggle("changed", days !== 0);
     }
 
     function resetToToday() {
@@ -180,8 +160,6 @@
       event.preventDefault();
       updateDate();
     });
-
-    window.addEventListener("resize", updateFontSize);
 
     updateDate();
     resetInactivityTimer();
