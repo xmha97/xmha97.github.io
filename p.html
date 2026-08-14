@@ -70,11 +70,120 @@
     const date = document.getElementById("date");
     const difference = document.getElementById("difference");
 
+    const DAY = 24 * 60 * 60 * 1000;
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     let selectedDate = new Date(today);
     let resetTimer;
+
+    function getPersianDate(date) {
+      const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
+        day: "numeric",
+        month: "numeric",
+        year: "numeric"
+      }).formatToParts(date);
+
+      return {
+        year: Number(parts.find(p => p.type === "year").value),
+        month: Number(parts.find(p => p.type === "month").value),
+        day: Number(parts.find(p => p.type === "day").value)
+      };
+    }
+
+    function addYears(date, years) {
+      const result = new Date(date);
+      result.setFullYear(result.getFullYear() + years);
+      return result;
+    }
+
+    function addMonths(date, months) {
+      const result = new Date(date);
+      result.setMonth(result.getMonth() + months);
+      return result;
+    }
+
+    function getDifference(from, to) {
+      const future = to > from;
+
+      if (!future) {
+        [from, to] = [to, from];
+      }
+
+      let years = 0;
+      let months = 0;
+      let cursor = new Date(from);
+
+      while (true) {
+        const next = addYears(cursor, 1);
+
+        if (next <= to) {
+          cursor = next;
+          years++;
+        } else {
+          break;
+        }
+      }
+
+      while (true) {
+        const next = addMonths(cursor, 1);
+
+        if (next <= to) {
+          cursor = next;
+          months++;
+        } else {
+          break;
+        }
+      }
+
+      const remainingDays = Math.round((to - cursor) / DAY);
+      const weeks = Math.floor(remainingDays / 7);
+      const days = remainingDays % 7;
+
+      return { future, years, months, weeks, days };
+    }
+
+    function formatDifference() {
+      if (selectedDate.getTime() === today.getTime()) {
+        return "Today";
+      }
+
+      const diff = getDifference(today, selectedDate);
+      const parts = [];
+
+      if (diff.years) {
+        parts.push(`${diff.years} year${diff.years === 1 ? "" : "s"}`);
+      }
+
+      if (diff.months) {
+        parts.push(`${diff.months} month${diff.months === 1 ? "" : "s"}`);
+      }
+
+      if (diff.weeks) {
+        parts.push(`${diff.weeks} week${diff.weeks === 1 ? "" : "s"}`);
+      }
+
+      if (diff.days) {
+        parts.push(`${diff.days} day${diff.days === 1 ? "" : "s"}`);
+      }
+
+      let result;
+
+      if (parts.length === 1) {
+        result = parts[0];
+      } else if (parts.length === 2) {
+        result = `${parts[0]} and ${parts[1]}`;
+      } else {
+        result =
+          parts.slice(0, -1).join(", ") +
+          `, and ${parts[parts.length - 1]}`;
+      }
+
+      return diff.future
+        ? `${result} from now`
+        : `${result} ago`;
+    }
 
     function updateFontSize() {
       let size = Math.min(window.innerWidth, window.innerHeight);
@@ -112,21 +221,9 @@
         weekday: "long"
       }).format(selectedDate);
 
-      const days = Math.round(
-        (selectedDate - today) / (1000 * 60 * 60 * 24)
-      );
+      difference.textContent = formatDifference();
 
-      if (days === 0) {
-        difference.textContent = "Today";
-      } else if (days === 1) {
-        difference.textContent = "1 day from now";
-      } else if (days > 1) {
-        difference.textContent = `${days} days from now`;
-      } else if (days === -1) {
-        difference.textContent = "1 day ago";
-      } else {
-        difference.textContent = `${Math.abs(days)} days ago`;
-      }
+      const days = Math.round((selectedDate - today) / DAY);
 
       const elements = [weekday, date, difference];
 
