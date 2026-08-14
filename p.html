@@ -63,15 +63,29 @@
     }
 
     document.addEventListener("keydown", event => {
-      if (event.key === "ArrowLeft") {
-        selectedDate.setDate(selectedDate.getDate() - 1);
-        updateDate();
+      switch (event.key) {
+        case "ArrowLeft":
+          selectedDate.setDate(selectedDate.getDate() - 1);
+          break;
+
+        case "ArrowRight":
+          selectedDate.setDate(selectedDate.getDate() + 1);
+          break;
+
+        case "ArrowUp":
+          selectedDate.setMonth(selectedDate.getMonth() + 1);
+          break;
+
+        case "ArrowDown":
+          selectedDate.setMonth(selectedDate.getMonth() - 1);
+          break;
+
+        default:
+          return;
       }
 
-      if (event.key === "ArrowRight") {
-        selectedDate.setDate(selectedDate.getDate() + 1);
-        updateDate();
-      }
+      event.preventDefault();
+      updateDate();
     });
 
     updateDate();
