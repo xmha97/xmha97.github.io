@@ -255,18 +255,26 @@
 
       switch (event.key) {
         case "ArrowLeft":
+        case "a":
+        case "A":
           selectedDate.setDate(selectedDate.getDate() - 1);
           break;
 
         case "ArrowRight":
+        case "d":
+        case "D":
           selectedDate.setDate(selectedDate.getDate() + 1);
           break;
 
         case "ArrowUp":
+        case "w":
+        case "W":
           selectedDate.setMonth(selectedDate.getMonth() + 1);
           break;
 
         case "ArrowDown":
+        case "s":
+        case "S":
           selectedDate.setMonth(selectedDate.getMonth() - 1);
           break;
 
@@ -357,21 +365,15 @@
       resetInactivityTimer();
 
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe → day
         if (deltaX < 0) {
-          // Swipe left → previous day
           selectedDate.setDate(selectedDate.getDate() - 1);
         } else {
-          // Swipe right → next day
           selectedDate.setDate(selectedDate.getDate() + 1);
         }
       } else {
-        // Vertical swipe → month
         if (deltaY < 0) {
-          // Swipe up → next month
           selectedDate.setMonth(selectedDate.getMonth() + 1);
         } else {
-          // Swipe down → previous month
           selectedDate.setMonth(selectedDate.getMonth() - 1);
         }
       }
