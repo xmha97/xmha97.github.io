@@ -48,10 +48,12 @@
       text-align: center;
     }
 
-    #date.changed,
-    #weekday.changed,
-    #difference.changed {
+    .past {
       color: red;
+    }
+
+    .future {
+      color: blue;
     }
   </style>
 </head>
@@ -105,9 +107,17 @@
         difference.textContent = `${Math.abs(days)} days ago`;
       }
 
-      weekday.classList.toggle("changed", days !== 0);
-      date.classList.toggle("changed", days !== 0);
-      difference.classList.toggle("changed", days !== 0);
+      const elements = [weekday, date, difference];
+
+      elements.forEach(element => {
+        element.classList.remove("past", "future");
+
+        if (days < 0) {
+          element.classList.add("past");
+        } else if (days > 0) {
+          element.classList.add("future");
+        }
+      });
     }
 
     function resetToToday() {
