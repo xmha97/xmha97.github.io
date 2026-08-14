@@ -28,6 +28,7 @@
       color: CanvasText;
       font-family: sans-serif;
       user-select: none;
+      touch-action: none;
     }
 
     #weekday,
@@ -84,6 +85,10 @@
 
     let selectedDate = new Date(today);
     let resetTimer;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let lastTapTime = 0;
 
     function addYears(date, years) {
       const result = new Date(date);
@@ -234,6 +239,7 @@
     function resetToToday() {
       selectedDate = new Date(today);
       updateDate();
+      resetInactivityTimer();
     }
 
     function resetInactivityTimer() {
@@ -308,6 +314,71 @@
 
       updateDate();
     }, { passive: false });
+
+    document.addEventListener("touchstart", event => {
+      if (event.touches.length !== 1) {
+        return;
+      }
+
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener("touchend", event => {
+      if (event.changedTouches.length !== 1) {
+        return;
+      }
+
+      const touchEndX = event.changedTouches[0].clientX;
+      const touchEndY = event.changedTouches[0].clientY;
+
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+
+      const minSwipeDistance = 50;
+
+      if (
+        Math.abs(deltaX) < minSwipeDistance &&
+        Math.abs(deltaY) < minSwipeDistance
+      ) {
+        const now = Date.now();
+
+        if (now - lastTapTime < 300) {
+          resetToToday();
+          lastTapTime = 0;
+        } else {
+          lastTapTime = now;
+          resetInactivityTimer();
+        }
+
+        return;
+      }
+
+      resetInactivityTimer();
+
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe → day
+        if (deltaX < 0) {
+          // Swipe left → previous day
+          selectedDate.setDate(selectedDate.getDate() - 1);
+        } else {
+          // Swipe right → next day
+          selectedDate.setDate(selectedDate.getDate() + 1);
+        }
+      } else {
+        // Vertical swipe → month
+        if (deltaY < 0) {
+          // Swipe up → next month
+          selectedDate.setMonth(selectedDate.getMonth() + 1);
+        } else {
+          // Swipe down → previous month
+          selectedDate.setMonth(selectedDate.getMonth() - 1);
+        }
+      }
+
+      updateDate();
+      lastTapTime = 0;
+    }, { passive: true });
 
     window.addEventListener("resize", updateFontSize);
 
