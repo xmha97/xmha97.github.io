@@ -25,6 +25,10 @@
       text-align: center;
       white-space: nowrap;
     }
+
+    #date.changed {
+      color: red;
+    }
   </style>
 </head>
 
@@ -32,19 +36,45 @@
   <div id="date"></div>
 
   <script>
-    const d = new Date();
+    const date = document.getElementById("date");
 
-    const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    }).formatToParts(d);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    const day = parts.find(p => p.type === "day").value;
-    const month = parts.find(p => p.type === "month").value;
-    const year = parts.find(p => p.type === "year").value;
+    let selectedDate = new Date(today);
 
-    date.textContent = `${month} ${day}, ${year}`;
+    function updateDate() {
+      const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).formatToParts(selectedDate);
+
+      const day = parts.find(p => p.type === "day").value;
+      const month = parts.find(p => p.type === "month").value;
+      const year = parts.find(p => p.type === "year").value;
+
+      date.textContent = `${month} ${day}, ${year}`;
+
+      date.classList.toggle(
+        "changed",
+        selectedDate.getTime() !== today.getTime()
+      );
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "ArrowLeft") {
+        selectedDate.setDate(selectedDate.getDate() - 1);
+        updateDate();
+      }
+
+      if (event.key === "ArrowRight") {
+        selectedDate.setDate(selectedDate.getDate() + 1);
+        updateDate();
+      }
+    });
+
+    updateDate();
   </script>
 </body>
 </html>
