@@ -1,2 +1,2 @@
 # HTMLs
-- [JalaliTV](https://xmha97.github.io/j)
+- [Jalify](https://xmha97.github.io/jalify)
