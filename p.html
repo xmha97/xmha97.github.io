@@ -169,13 +169,19 @@
           break;
 
         case "ArrowUp":
-        case "PageUp":
           selectedDate.setMonth(selectedDate.getMonth() + 1);
           break;
 
         case "ArrowDown":
-        case "PageDown":
           selectedDate.setMonth(selectedDate.getMonth() - 1);
+          break;
+
+        case "PageUp":
+          selectedDate.setFullYear(selectedDate.getFullYear() + 1);
+          break;
+
+        case "PageDown":
+          selectedDate.setFullYear(selectedDate.getFullYear() - 1);
           break;
 
         case "Backspace":
