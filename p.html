@@ -25,24 +25,45 @@
       user-select: none;
     }
 
-    #date {
-      font-size: 20vh;
-      font-weight: 500;
+    #container {
       text-align: center;
+      line-height: 1.1;
       white-space: nowrap;
     }
 
-    #date.changed {
+    #weekday {
+      font-size: 0.5em;
+      font-weight: 400;
+    }
+
+    #date {
+      font-size: 1em;
+      font-weight: 500;
+    }
+
+    #difference {
+      font-size: 0.35em;
+      font-weight: 400;
+    }
+
+    #container.changed {
       color: red;
     }
   </style>
 </head>
 
 <body>
-  <div id="date"></div>
+  <div id="container">
+    <div id="weekday"></div>
+    <div id="date"></div>
+    <div id="difference"></div>
+  </div>
 
   <script>
+    const container = document.getElementById("container");
+    const weekday = document.getElementById("weekday");
     const date = document.getElementById("date");
+    const difference = document.getElementById("difference");
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -53,24 +74,29 @@
     function updateFontSize() {
       let size = Math.min(window.innerWidth, window.innerHeight);
 
-      date.style.fontSize = `${size}px`;
+      container.style.fontSize = `${size}px`;
 
       while (
-        (date.scrollWidth > window.innerWidth ||
-         date.scrollHeight > window.innerHeight) &&
+        (container.scrollWidth > window.innerWidth ||
+         container.scrollHeight > window.innerHeight) &&
         size > 1
       ) {
         size -= 1;
-        date.style.fontSize = `${size}px`;
+        container.style.fontSize = `${size}px`;
       }
     }
 
     function updateDate() {
-      const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      }).formatToParts(selectedDate);
+      const formatter = new Intl.DateTimeFormat(
+        "en-US-u-ca-persian",
+        {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+      const parts = formatter.formatToParts(selectedDate);
 
       const day = parts.find(p => p.type === "day").value;
       const month = parts.find(p => p.type === "month").value;
@@ -78,10 +104,28 @@
 
       date.textContent = `${month} ${day}, ${year}`;
 
-      date.classList.toggle(
-        "changed",
-        selectedDate.getTime() !== today.getTime()
-      );
+      weekday.textContent = new Intl.DateTimeFormat("en-US", {
+        weekday: "long"
+      }).format(selectedDate);
+
+      const days =
+        Math.round(
+          (selectedDate - today) / (1000 * 60 * 60 * 24)
+        );
+
+      if (days === 0) {
+        difference.textContent = "Today";
+      } else if (days === 1) {
+        difference.textContent = "1 day from now";
+      } else if (days > 1) {
+        difference.textContent = `${days} days from now`;
+      } else if (days === -1) {
+        difference.textContent = "1 day ago";
+      } else {
+        difference.textContent = `${Math.abs(days)} days ago`;
+      }
+
+      container.classList.toggle("changed", days !== 0);
 
       updateFontSize();
     }
