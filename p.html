@@ -26,8 +26,6 @@
     }
 
     #date {
-      max-width: 100vw;
-      max-height: 100vh;
       font-size: 20vh;
       font-weight: 500;
       text-align: center;
@@ -50,6 +48,7 @@
     today.setHours(0, 0, 0, 0);
 
     let selectedDate = new Date(today);
+    let resetTimer;
 
     function updateFontSize() {
       let size = Math.min(window.innerWidth, window.innerHeight);
@@ -92,7 +91,17 @@
       updateDate();
     }
 
+    function resetInactivityTimer() {
+      clearTimeout(resetTimer);
+
+      resetTimer = setTimeout(() => {
+        resetToToday();
+      }, 10000);
+    }
+
     document.addEventListener("keydown", event => {
+      resetInactivityTimer();
+
       switch (event.key) {
         case "ArrowLeft":
           selectedDate.setDate(selectedDate.getDate() - 1);
@@ -131,6 +140,7 @@
     window.addEventListener("resize", updateFontSize);
 
     updateDate();
+    resetInactivityTimer();
   </script>
 </body>
 </html>
