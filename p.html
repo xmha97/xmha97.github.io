@@ -30,22 +30,24 @@
     }
 
     #weekday {
-      font-size: min(5vw, 8vh);
+      font-size: 5vw;
       font-weight: 400;
       text-align: center;
+      white-space: nowrap;
     }
 
     #date {
-      font-size: min(12vw, 20vh);
+      font-size: 20vh;
       font-weight: 500;
       text-align: center;
       white-space: nowrap;
     }
 
     #difference {
-      font-size: min(4vw, 6vh);
+      font-size: 4vw;
       font-weight: 400;
       text-align: center;
+      white-space: nowrap;
     }
 
     .past {
@@ -73,6 +75,25 @@
 
     let selectedDate = new Date(today);
     let resetTimer;
+
+    function updateFontSize() {
+      let size = Math.min(window.innerWidth, window.innerHeight);
+
+      date.style.fontSize = `${size}px`;
+
+      while (
+        (
+          weekday.scrollWidth > window.innerWidth ||
+          difference.scrollWidth > window.innerWidth ||
+          date.scrollWidth > window.innerWidth ||
+          document.body.scrollHeight > window.innerHeight
+        ) &&
+        size > 1
+      ) {
+        size -= 1;
+        date.style.fontSize = `${size}px`;
+      }
+    }
 
     function updateDate() {
       const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
@@ -118,6 +139,8 @@
           element.classList.add("future");
         }
       });
+
+      updateFontSize();
     }
 
     function resetToToday() {
@@ -170,6 +193,8 @@
       event.preventDefault();
       updateDate();
     });
+
+    window.addEventListener("resize", updateFontSize);
 
     updateDate();
     resetInactivityTimer();
