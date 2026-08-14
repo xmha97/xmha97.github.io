@@ -1,2 +1,2 @@
 # HTMLs
-- [JalaliTV](./j)
+- [JalaliTV](https://xmha97.github.io/j)
