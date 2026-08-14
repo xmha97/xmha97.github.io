@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
+  <title>JalaliTV</title>
 
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📅</text></svg>">
 
@@ -77,20 +78,6 @@
 
     let selectedDate = new Date(today);
     let resetTimer;
-
-    function getPersianDate(date) {
-      const parts = new Intl.DateTimeFormat("en-US-u-ca-persian", {
-        day: "numeric",
-        month: "numeric",
-        year: "numeric"
-      }).formatToParts(date);
-
-      return {
-        year: Number(parts.find(p => p.type === "year").value),
-        month: Number(parts.find(p => p.type === "month").value),
-        day: Number(parts.find(p => p.type === "day").value)
-      };
-    }
 
     function addYears(date, years) {
       const result = new Date(date);
@@ -225,9 +212,7 @@
 
       const days = Math.round((selectedDate - today) / DAY);
 
-      const elements = [weekday, date, difference];
-
-      elements.forEach(element => {
+      [weekday, date, difference].forEach(element => {
         element.classList.remove("past", "future");
 
         if (days < 0) {
